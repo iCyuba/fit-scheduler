@@ -9,7 +9,7 @@ pub type Choice<'s> = Option<SubPar<'s>>;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Choices<'s>(pub [[Choice<'s>; 7]; 7]);
 
-pub struct Schedule<'s> {
+pub struct Scheduler<'s> {
     subjects: &'s [Subject],
     choices: Choices<'s>,
 
@@ -17,7 +17,7 @@ pub struct Schedule<'s> {
     finalize: &'s mut dyn FnMut(Choices<'s>),
 }
 
-impl<'s> Schedule<'s> {
+impl<'s> Scheduler<'s> {
     pub fn choose(
         subjects: &'s [Subject],
         filter: &'s mut dyn FnMut(SubPar<'s>, Choices<'s>) -> bool,
@@ -58,7 +58,7 @@ impl<'s> Schedule<'s> {
         };
 
         for l in &subj.lectures {
-            let choice = &mut self.choices.0[l.day as usize][l.block as usize];
+            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
 
             if choice.is_some() {
                 continue;
@@ -70,7 +70,7 @@ impl<'s> Schedule<'s> {
                 self.choose_lectures(iter.clone());
             }
 
-            self.choices.0[l.day as usize][l.block as usize] = None;
+            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
         }
     }
 
@@ -87,7 +87,7 @@ impl<'s> Schedule<'s> {
         };
 
         for l in &subj.seminars {
-            let choice = &mut self.choices.0[l.day as usize][l.block as usize];
+            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
 
             if choice.is_some() {
                 continue;
@@ -99,7 +99,7 @@ impl<'s> Schedule<'s> {
                 self.choose_seminar(iter.clone());
             }
 
-            self.choices.0[l.day as usize][l.block as usize] = None;
+            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
         }
     }
 
@@ -111,7 +111,7 @@ impl<'s> Schedule<'s> {
         };
 
         for l in &subj.labs {
-            let choice = &mut self.choices.0[l.day as usize][l.block as usize];
+            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
 
             if choice.is_some() {
                 continue;
@@ -123,7 +123,7 @@ impl<'s> Schedule<'s> {
                 self.choose_lab(iter.clone());
             }
 
-            self.choices.0[l.day as usize][l.block as usize] = None;
+            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
         }
     }
 }
