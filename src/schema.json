@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "object",
+  "title": "Semesters",
+  "additionalProperties": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/Subject"
+    }
+  },
+  "definitions": {
+    "Subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parallels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Parallel"
+          }
+        }
+      },
+      "required": ["code", "name", "parallels"],
+      "title": "Subject"
+    },
+    "Parallel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "can_register": {
+          "type": "boolean"
+        },
+        "capacity": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_full": {
+          "type": "boolean"
+        },
+        "num": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "occupied_places": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timetable": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Timetable"
+          }
+        },
+        "type": {
+          "$ref": "#/definitions/Type"
+        }
+      },
+      "required": [
+        "can_register",
+        "capacity",
+        "is_full",
+        "num",
+        "occupied_places",
+        "timetable",
+        "type"
+      ],
+      "title": "Parallel"
+    },
+    "Timetable": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "day": {
+          "type": "integer"
+        },
+        "end": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "room": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "start": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "week": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Week"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "weeks_valid": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": ["day", "end", "room", "start", "week", "weeks_valid"],
+      "title": "Timetable"
+    },
+    "Week": {
+      "type": "string",
+      "enum": ["S", "L"],
+      "title": "Week"
+    },
+    "Type": {
+      "type": "string",
+      "enum": ["L", "C", "P"],
+      "title": "Type"
+    }
+  }
+}
