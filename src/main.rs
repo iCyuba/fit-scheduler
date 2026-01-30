@@ -2,6 +2,7 @@ use anyhow::Context;
 
 use crate::data::{Block, Day, Parallel};
 
+pub mod choices;
 pub mod data;
 pub mod json;
 pub mod scheduler;
@@ -54,27 +55,7 @@ fn main() -> anyhow::Result<()> {
     let mut options = 0;
     scheduler::Scheduler::choose(
         &subjects,
-        &mut |(_, par), choices| {
-            let mut consec = 0;
-
-            for i in (0..par.time.block as usize).rev() {
-                if choices.0[par.time.day as usize][i].is_none() {
-                    break;
-                }
-
-                consec += 1;
-            }
-
-            for i in par.time.block as usize + 1..7 {
-                if choices.0[par.time.day as usize][i].is_none() {
-                    break;
-                }
-
-                consec += 1;
-            }
-
-            consec < 3
-        },
+        &mut |(_, par), choices| choices.consecutive(par.time) < 3,
         &mut |c| {
             options += 1;
 

@@ -1,31 +1,27 @@
-use std::fmt::Display;
-
 use itertools::Itertools;
 
-use crate::data::{Day, SubPar, Subject};
-
-pub type Choice<'s> = Option<SubPar<'s>>;
-
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Choices<'s>(pub [[Choice<'s>; 7]; 7]);
+use crate::{
+    choices::Choices,
+    data::{SubPar, Subject},
+};
 
 pub struct Scheduler<'s> {
     subjects: &'s [Subject],
-    choices: Choices<'s>,
+    choices: Box<Choices<'s>>,
 
-    filter: &'s mut dyn FnMut(SubPar<'s>, Choices<'s>) -> bool,
-    finalize: &'s mut dyn FnMut(Choices<'s>),
+    filter: &'s mut dyn FnMut(SubPar<'s>, &Choices<'s>) -> bool,
+    finalize: &'s mut dyn FnMut(&Choices<'s>),
 }
 
 impl<'s> Scheduler<'s> {
     pub fn choose(
         subjects: &'s [Subject],
-        filter: &'s mut dyn FnMut(SubPar<'s>, Choices<'s>) -> bool,
-        finalize: &'s mut dyn FnMut(Choices<'s>),
+        filter: &'s mut dyn FnMut(SubPar<'s>, &Choices<'s>) -> bool,
+        finalize: &'s mut dyn FnMut(&Choices<'s>),
     ) {
         let mut this = Self {
             subjects,
-            choices: Choices::default(),
+            choices: Box::new(Choices::default()),
 
             filter,
             finalize,
@@ -42,7 +38,7 @@ impl<'s> Scheduler<'s> {
     pub fn finalize(&mut self) {
         // println!("{}", self.choices);
 
-        (self.finalize)(self.choices);
+        (self.finalize)(&self.choices);
     }
 
     fn choose_lectures(&mut self, mut iter: impl Iterator<Item = &'s Subject> + Clone) {
@@ -58,7 +54,7 @@ impl<'s> Scheduler<'s> {
         };
 
         for l in &subj.lectures {
-            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
+            let choice = &mut self.choices[l.time];
 
             if choice.is_some() {
                 continue;
@@ -66,11 +62,11 @@ impl<'s> Scheduler<'s> {
                 *choice = Some((subj, l))
             }
 
-            if (self.filter)((subj, l), self.choices) {
+            if (self.filter)((subj, l), &self.choices) {
                 self.choose_lectures(iter.clone());
             }
 
-            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
+            self.choices[l.time] = None;
         }
     }
 
@@ -87,7 +83,7 @@ impl<'s> Scheduler<'s> {
         };
 
         for l in &subj.seminars {
-            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
+            let choice = &mut self.choices[l.time];
 
             if choice.is_some() {
                 continue;
@@ -95,11 +91,11 @@ impl<'s> Scheduler<'s> {
                 *choice = Some((subj, l))
             }
 
-            if (self.filter)((subj, l), self.choices) {
+            if (self.filter)((subj, l), &self.choices) {
                 self.choose_seminar(iter.clone());
             }
 
-            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
+            self.choices[l.time] = None;
         }
     }
 
@@ -111,7 +107,7 @@ impl<'s> Scheduler<'s> {
         };
 
         for l in &subj.labs {
-            let choice = &mut self.choices.0[l.time.day as usize][l.time.block as usize];
+            let choice = &mut self.choices[l.time];
 
             if choice.is_some() {
                 continue;
@@ -119,33 +115,11 @@ impl<'s> Scheduler<'s> {
                 *choice = Some((subj, l))
             }
 
-            if (self.filter)((subj, l), self.choices) {
+            if (self.filter)((subj, l), &self.choices) {
                 self.choose_lab(iter.clone());
             }
 
-            self.choices.0[l.time.day as usize][l.time.block as usize] = None;
+            self.choices[l.time] = None;
         }
-    }
-}
-
-impl<'p> Display for Choices<'p> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, ",7:30, 9:15,11:00,12:45,14:30,16:15,18:00")?;
-
-        for day in 1..6 {
-            write!(f, "{}", Day::try_from(day).unwrap())?;
-
-            for block in self.0[day as usize] {
-                write!(f, ",")?;
-
-                if let Some((subj, par)) = block {
-                    write!(f, "{subj} {par}")?;
-                };
-            }
-
-            writeln!(f)?;
-        }
-
-        Ok(())
     }
 }
