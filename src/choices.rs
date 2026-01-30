@@ -4,6 +4,8 @@ use std::{
     ptr,
 };
 
+use strum::IntoEnumIterator;
+
 use crate::data::{Block, Day, SubPar, Time};
 
 #[derive(Debug, Clone, Default)]
@@ -122,18 +124,19 @@ impl<'p> Display for Choices<'p> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, ",7:30, 9:15,11:00,12:45,14:30,16:15,18:00")?;
 
-        for day in 1..6 {
-            let day = Day::try_from(day).unwrap();
-
+        for day in Day::iter().skip(1).take(5) {
             write!(f, "{}", day)?;
 
-            for (&odd, &even) in self[false][day].0.iter().zip(&self[true][day].0) {
+            let odd = &self[false][day];
+            let even = &self[true][day];
+
+            for block in Block::iter() {
                 write!(f, ",")?;
 
-                if let Some((subj, par)) = odd {
+                if let Some((subj, par)) = odd[block] {
                     write!(f, "{subj} {par}")?;
 
-                    if let Some((subj_even, par_even)) = even
+                    if let Some((subj_even, par_even)) = even[block]
                         && !(ptr::addr_eq(subj, subj_even) && par == par_even)
                     {
                         write!(f, " / {subj_even} {par_even}")?;

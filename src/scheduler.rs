@@ -40,11 +40,23 @@ impl<'s> Scheduler<'s> {
                     (self.callbacks.filter)(sp).then_some(sp)
                 };
 
-                [
-                    s.lectures.iter().dedup().filter_map(fm).collect_vec(),
-                    s.seminars.iter().dedup().filter_map(fm).collect_vec(),
-                    s.labs.iter().dedup().filter_map(fm).collect_vec(),
-                ]
+                let lectures = s.lectures.iter().dedup().filter_map(fm).collect_vec();
+                let seminars = s.seminars.iter().dedup().filter_map(fm).collect_vec();
+                let labs = s.labs.iter().dedup().filter_map(fm).collect_vec();
+
+                if lectures.is_empty() {
+                    eprintln!("{s} lectures are empty!");
+                }
+
+                if seminars.is_empty() {
+                    eprintln!("{s} seminars are empty!");
+                }
+
+                if labs.is_empty() {
+                    eprintln!("{s} labs are empty!");
+                }
+
+                [lectures, seminars, labs]
             })
             .filter(|v| !v.is_empty())
             .sorted_unstable_by_key(|v| v.len())

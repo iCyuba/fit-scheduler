@@ -2,6 +2,7 @@ use std::fmt::{Debug, Display};
 
 use anyhow::bail;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+use strum::EnumIter;
 
 use crate::json;
 
@@ -25,7 +26,7 @@ pub struct Parallel {
     pub kind: Type,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, IntoPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, IntoPrimitive, EnumIter)]
 #[repr(u8)]
 pub enum Day {
     Sunday,
@@ -37,7 +38,7 @@ pub enum Day {
     Saturday,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, IntoPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, IntoPrimitive, EnumIter)]
 #[repr(u8)]
 pub enum Block {
     _7_30,
