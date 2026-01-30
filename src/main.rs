@@ -1,6 +1,6 @@
 use anyhow::Context;
 
-use crate::data::{Block, Day, Parallel};
+use crate::data::{Block, Day, Type};
 
 pub mod choices;
 pub mod data;
@@ -13,7 +13,7 @@ const CURR: &str = "B252";
 
 fn main() -> anyhow::Result<()> {
     let mut data = serde_json::from_str::<json::Semesters>(DATA)?;
-    let mut subjects: Vec<data::Subject> = data
+    let subjects: Vec<data::Subject> = data
         .0
         .remove(CURR)
         .context("Missing semester")?
@@ -27,41 +27,36 @@ fn main() -> anyhow::Result<()> {
         .map(data::Subject::from)
         .collect();
 
-    for sub in &mut subjects {
-        if matches!(sub.code.as_str(), "BI-MA1.21") {
-            sub.labs.clear();
-            sub.lectures.retain(|p| p.time.day == Day::Thursday);
-        }
-
-        if matches!(sub.code.as_str(), "BI-DBS.21") {
-            sub.labs.retain(|p| p.time.day == Day::Wednesday);
-        }
-
-        let filter = |p: &Parallel| match p.time.day {
-            Day::Thursday => matches!(p.time.block, Block::_12_45 | Block::_14_30 | Block::_16_15),
-            Day::Friday => false,
-            _ => !matches!(p.time.block, Block::_7_30 | Block::_18_00),
-        };
-
-        sub.lectures.retain(filter);
-        sub.seminars.retain(filter);
-        sub.labs.retain(filter);
-
-        sub.lectures.dedup();
-        sub.seminars.dedup();
-        sub.labs.dedup();
-    }
-
     let mut options = 0;
-    scheduler::Scheduler::choose(
-        &subjects,
-        &mut |(_, par), choices| choices.consecutive(par.time) < 3,
-        &mut |c| {
+    let cb = scheduler::SchedulerCallbacks {
+        filter: &|(s, p)| {
+            (match s.code.as_str() {
+                "BI-MA1.21" => match p.kind {
+                    Type::L => false,
+                    Type::C => true,
+                    Type::P => p.time.day == Day::Thursday,
+                },
+
+                "BI-DBS.21" => p.kind != Type::L || p.time.day == Day::Wednesday,
+
+                _ => true,
+            }) && match p.time.day {
+                Day::Thursday => {
+                    matches!(p.time.block, Block::_12_45 | Block::_14_30 | Block::_16_15)
+                }
+                Day::Friday => false,
+                _ => !matches!(p.time.block, Block::_7_30 | Block::_18_00),
+            }
+        },
+        select: &|(_, p), choices| choices.consecutive(p.time) < 3,
+        callback: &mut |choices| {
             options += 1;
 
-            println!("{options}{c}");
+            println!("{options}{choices}");
         },
-    );
+    };
+
+    scheduler::Scheduler::new(cb).schedule(&subjects);
 
     eprintln!("Total: {options}");
 
