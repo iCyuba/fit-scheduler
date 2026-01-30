@@ -53,6 +53,7 @@ pub enum Block {
 pub struct Time {
     pub day: Day,
     pub block: Block,
+    pub biweekly: bool,
 }
 
 impl Display for Block {
@@ -115,6 +116,7 @@ impl From<json::Subject> for Subject {
                 time: Time {
                     day: Day::try_from(timetable.day as u8).unwrap(),
                     block: timetable.start[..2].try_into().unwrap(),
+                    biweekly: timetable.week.is_some(),
                 },
                 kind: p.type_,
             };

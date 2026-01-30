@@ -21,7 +21,13 @@ fn main() -> anyhow::Result<()> {
         .filter(|s| {
             matches!(
                 s.code.as_str(),
-                "BI-PA2.21" | "BI-MA1.21" | "BI-DBS.21" | "BI-SAP.21" | "BI-LA2.21" | "A0B04KS2"
+                "BI-PA2.21"
+                    | "BI-MA1.21"
+                    | "BI-DBS.21"
+                    | "BI-SAP.21"
+                    | "BI-LA2.21"
+                    | "BI-PSI.21"
+                    | "A0B04KS2"
             )
         })
         .map(data::Subject::from)

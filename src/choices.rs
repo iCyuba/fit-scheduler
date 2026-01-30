@@ -1,6 +1,7 @@
 use std::{
     fmt::Display,
     ops::{Index, IndexMut},
+    ptr,
 };
 
 use crate::data::{Block, Day, SubPar, Time};
@@ -9,7 +10,10 @@ use crate::data::{Block, Day, SubPar, Time};
 pub struct ChoicesDay<'s>([Option<SubPar<'s>>; 7]);
 
 #[derive(Debug, Clone, Default)]
-pub struct Choices<'s>([ChoicesDay<'s>; 7]);
+pub struct ChoicesWeek<'s>([ChoicesDay<'s>; 7]);
+
+#[derive(Debug, Clone, Default)]
+pub struct Choices<'s>([ChoicesWeek<'s>; 2]);
 
 impl ChoicesDay<'_> {
     pub fn consecutive(&self, block: Block) -> u8 {
@@ -37,7 +41,10 @@ impl ChoicesDay<'_> {
 
 impl Choices<'_> {
     pub fn consecutive(&self, time: Time) -> u8 {
-        self[time.day].consecutive(time.block)
+        u8::max(
+            self[false][time.day].consecutive(time.block),
+            self[true][time.day].consecutive(time.block),
+        )
     }
 }
 
@@ -55,7 +62,7 @@ impl<'s> IndexMut<Block> for ChoicesDay<'s> {
     }
 }
 
-impl<'s> Index<Day> for Choices<'s> {
+impl<'s> Index<Day> for ChoicesWeek<'s> {
     type Output = ChoicesDay<'s>;
 
     fn index(&self, index: Day) -> &Self::Output {
@@ -63,8 +70,36 @@ impl<'s> Index<Day> for Choices<'s> {
     }
 }
 
-impl<'s> IndexMut<Day> for Choices<'s> {
+impl<'s> IndexMut<Day> for ChoicesWeek<'s> {
     fn index_mut(&mut self, index: Day) -> &mut Self::Output {
+        &mut self.0[index as usize]
+    }
+}
+
+impl<'s> Index<Time> for ChoicesWeek<'s> {
+    type Output = Option<SubPar<'s>>;
+
+    fn index(&self, index: Time) -> &Self::Output {
+        &self[index.day][index.block]
+    }
+}
+
+impl<'s> IndexMut<Time> for ChoicesWeek<'s> {
+    fn index_mut(&mut self, index: Time) -> &mut Self::Output {
+        &mut self[index.day][index.block]
+    }
+}
+
+impl<'s> Index<bool> for Choices<'s> {
+    type Output = ChoicesWeek<'s>;
+
+    fn index(&self, index: bool) -> &Self::Output {
+        &self.0[index as usize]
+    }
+}
+
+impl<'s> IndexMut<bool> for Choices<'s> {
+    fn index_mut(&mut self, index: bool) -> &mut Self::Output {
         &mut self.0[index as usize]
     }
 }
@@ -73,13 +108,13 @@ impl<'s> Index<Time> for Choices<'s> {
     type Output = Option<SubPar<'s>>;
 
     fn index(&self, index: Time) -> &Self::Output {
-        &self[index.day][index.block]
+        &self[index.biweekly][index.day][index.block]
     }
 }
 
 impl<'s> IndexMut<Time> for Choices<'s> {
     fn index_mut(&mut self, index: Time) -> &mut Self::Output {
-        &mut self[index.day][index.block]
+        &mut self[index.biweekly][index.day][index.block]
     }
 }
 
@@ -92,11 +127,17 @@ impl<'p> Display for Choices<'p> {
 
             write!(f, "{}", day)?;
 
-            for block in self[day].0 {
+            for (&odd, &even) in self[false][day].0.iter().zip(&self[true][day].0) {
                 write!(f, ",")?;
 
-                if let Some((subj, time)) = block {
-                    write!(f, "{subj} {time}")?;
+                if let Some((subj, par)) = odd {
+                    write!(f, "{subj} {par}")?;
+
+                    if let Some((subj_even, par_even)) = even
+                        && !(ptr::addr_eq(subj, subj_even) && par == par_even)
+                    {
+                        write!(f, " / {subj_even} {par_even}")?;
+                    };
                 };
             }
 

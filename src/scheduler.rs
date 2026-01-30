@@ -63,17 +63,31 @@ impl<'s> Scheduler<'s> {
 
         for &sp in parallels {
             let (_, p) = sp;
-            if self.choices[p.time].is_some() {
+
+            let odd = self.choices[false][p.time].is_some();
+            if odd && self.choices[p.time].is_some() {
                 continue;
             }
 
-            self.choices[p.time] = Some(sp);
+            let mut index_a = p.time;
+            let mut index_b = p.time;
+
+            if !p.time.biweekly {
+                index_a.biweekly = true;
+            } else if !odd {
+                index_a.biweekly = false;
+                index_b.biweekly = false;
+            }
+
+            self.choices[index_a] = Some(sp);
+            self.choices[index_b] = Some(sp);
 
             if (self.callbacks.select)(sp, &self.choices) {
                 self.select(iter.clone());
             }
 
-            self.choices[p.time] = None;
+            self.choices[index_a] = None;
+            self.choices[index_b] = None;
         }
     }
 }
