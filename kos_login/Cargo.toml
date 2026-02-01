@@ -1,0 +1,13 @@
+[package]
+name = "kos_login"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+fantoccini = "0.22.0"
+securestore = "0.100.0"
+serde = "1.0.228"
+serde_json = "1.0.149"
+tokio = { version = "1", features = ["full"] }
+totp-rs = { version = "5.7.0", features = ["otpauth"] }
