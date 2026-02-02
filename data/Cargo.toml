@@ -1,0 +1,8 @@
+[package]
+name = "data"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+typify = "0.5.0"

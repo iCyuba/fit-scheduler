@@ -1,0 +1,170 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/Course"
+  },
+  "definitions": {
+    "Course": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "completion": {
+          "$ref": "#/definitions/Value"
+        },
+        "credits": {
+          "type": "integer"
+        },
+        "department": {
+          "$ref": "#/definitions/Department"
+        },
+        "extent": {
+          "type": "string"
+        },
+        "faculty": {
+          "$ref": "#/definitions/Department"
+        },
+        "forProgrammes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Department"
+          }
+        },
+        "hasPrerequisite": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "nameCs": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "programmeTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "repeatedRegistration": {
+          "type": "boolean"
+        },
+        "state": {
+          "$ref": "#/definitions/Value"
+        },
+        "studyForm": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "teachingLanguage": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "withoutSchedule": {
+          "type": "boolean"
+        },
+        "capacity": {
+          "type": "integer"
+        },
+        "tutorialCapacity": {
+          "type": "integer"
+        },
+        "keyWordsCs": {
+          "type": "string",
+          "qt-uri-protocols": ["http", "https"],
+          "qt-uri-extensions": [".htm", ".html"]
+        },
+        "keyWordsEn": {
+          "type": "string",
+          "qt-uri-protocols": ["https"],
+          "qt-uri-extensions": [".htm"]
+        },
+        "webPage": {
+          "type": "string",
+          "qt-uri-protocols": ["http", "https"],
+          "qt-uri-extensions": [
+            ".20",
+            ".21",
+            ".aspx",
+            ".com",
+            ".cz",
+            ".htm",
+            ".html",
+            ".html (anglický jazyk)",
+            ".pdf",
+            ".php"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "completion",
+        "forProgrammes",
+        "hasPrerequisite",
+        "id",
+        "nameCs",
+        "programmeTypes",
+        "repeatedRegistration",
+        "state",
+        "studyForm",
+        "teachingLanguage",
+        "withoutSchedule"
+      ],
+      "title": "Course"
+    },
+    "Department": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer"
+        }
+      },
+      "required": ["id"],
+      "title": "Department"
+    },
+    "Value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/CodeUnion"
+        },
+        "listName": {
+          "$ref": "#/definitions/ListName"
+        }
+      },
+      "required": ["code", "listName"],
+      "title": "Value"
+    },
+    "CodeUnion": {
+      "type": "string",
+      "title": "CodeUnion"
+    },
+    "CodeEnum": {
+      "type": "string",
+      "title": "CodeEnum"
+    },
+    "ListName": {
+      "type": "string",
+      "title": "ListName"
+    }
+  }
+}

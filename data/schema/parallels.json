@@ -1,0 +1,321 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/Parallel"
+  },
+  "definitions": {
+    "Parallel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capacity": {
+          "type": "integer"
+        },
+        "capacityChecked": {
+          "type": "boolean"
+        },
+        "courseView": {
+          "$ref": "#/definitions/Value"
+        },
+        "department": {
+          "$ref": "#/definitions/Value"
+        },
+        "exerciseParallelNumber": {
+          "type": "integer"
+        },
+        "faculty": {
+          "$ref": "#/definitions/Value"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "lectureParallelNumber": {
+          "type": "integer"
+        },
+        "occupiedPlaces": {
+          "type": "integer"
+        },
+        "parallelNumber": {
+          "type": "integer"
+        },
+        "parallelType": {
+          "$ref": "#/definitions/ParallelType"
+        },
+        "registration": {
+          "$ref": "#/definitions/Registration"
+        },
+        "semester": {
+          "$ref": "#/definitions/Semester"
+        },
+        "teacher1": {
+          "$ref": "#/definitions/Value"
+        },
+        "timetable": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Timetable"
+          }
+        },
+        "whenChanged": {
+          "type": "string",
+          "format": "string"
+        },
+        "whoChanged": {
+          "$ref": "#/definitions/WhoChanged"
+        },
+        "laboratoryParallelNumber": {
+          "type": "integer"
+        },
+        "teacher2": {
+          "$ref": "#/definitions/Value"
+        },
+        "studyParallelCode": {
+          "type": "string"
+        },
+        "parallelClassNameCs": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "courseView",
+        "faculty",
+        "id",
+        "parallelType",
+        "semester",
+        "timetable",
+        "whenChanged",
+        "whoChanged"
+      ],
+      "title": "Parallel"
+    },
+    "Value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer"
+        }
+      },
+      "required": ["id"],
+      "title": "Value"
+    },
+    "Semester": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/ID"
+        }
+      },
+      "required": ["id"],
+      "title": "Semester"
+    },
+    "Timetable": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dayNumber": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "room": {
+          "$ref": "#/definitions/Room"
+        },
+        "ticketEnd": {
+          "$ref": "#/definitions/Ticket"
+        },
+        "ticketStart": {
+          "$ref": "#/definitions/Ticket"
+        },
+        "weeks": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "evenOddWeek": {
+          "$ref": "#/definitions/EvenOddWeek"
+        },
+        "teachers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Teacher"
+          }
+        }
+      },
+      "required": ["dayNumber", "id", "ticketEnd", "ticketStart", "weeks"],
+      "title": "Timetable"
+    },
+    "Room": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/Address"
+        },
+        "department": {
+          "$ref": "#/definitions/Value"
+        },
+        "examCapacity": {
+          "type": "integer"
+        },
+        "faculty": {
+          "$ref": "#/definitions/Value"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ParallelType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nameCs": {
+          "type": "string"
+        },
+        "roomCode": {
+          "type": "string"
+        },
+        "roomNumber": {
+          "type": "string"
+        },
+        "teachingCapacity": {
+          "type": "integer"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ParallelType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nameEn": {
+          "$ref": "#/definitions/NameEn"
+        },
+        "webUrl": {
+          "type": "string",
+          "format": "uri",
+          "qt-uri-protocols": ["https"]
+        }
+      },
+      "required": ["faculty", "id", "location", "roomNumber", "type"],
+      "title": "Room"
+    },
+    "ParallelType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/Code"
+        },
+        "listName": {
+          "$ref": "#/definitions/ListName"
+        }
+      },
+      "required": ["code", "listName"],
+      "title": "ParallelType"
+    },
+    "Teacher": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "degreeAfter": {
+          "type": "string"
+        },
+        "degreeBefore": {
+          "type": "string"
+        },
+        "department": {
+          "$ref": "#/definitions/Value"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "personEid": {
+          "type": "integer"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string",
+          "format": "string"
+        },
+        "workplace": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "degreeBefore",
+        "department",
+        "email",
+        "firstName",
+        "id",
+        "lastName",
+        "personEid",
+        "username",
+        "uuid"
+      ],
+      "title": "Teacher"
+    },
+    "Code": {
+      "type": "string",
+      "title": "Code"
+    },
+    "ListName": {
+      "type": "string",
+      "title": "ListName"
+    },
+    "Registration": {
+      "type": "string",
+      "title": "Registration"
+    },
+    "ID": {
+      "type": "string",
+      "title": "ID"
+    },
+    "EvenOddWeek": {
+      "type": "string",
+      "title": "EvenOddWeek"
+    },
+    "Address": {
+      "type": "string",
+      "title": "Address"
+    },
+    "NameEn": {
+      "type": "string",
+      "title": "NameEn"
+    },
+    "Ticket": {
+      "type": "string",
+      "title": "Ticket"
+    },
+    "WhoChanged": {
+      "type": "string",
+      "title": "WhoChanged"
+    }
+  }
+}

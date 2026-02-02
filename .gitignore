@@ -4,3 +4,4 @@ out.csv
 src/data.json
 
 secret*
+data/cached

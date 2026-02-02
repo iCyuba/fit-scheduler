@@ -14,4 +14,4 @@ typify = "0.5.0"
 
 [workspace]
 resolver = "3"
-members = ["kos_login"]
+members = ["data", "kos_api", "kos_login"]
