@@ -1,12 +1,11 @@
 use std::{
     fmt::Display,
     ops::{Index, IndexMut},
-    ptr,
 };
 
 use strum::IntoEnumIterator;
 
-use crate::data::{Block, Day, SubPar, Time};
+use data::{Block, Day, SubPar, Time};
 
 #[derive(Debug, Clone, Default)]
 pub struct ChoicesDay<'s>([Option<SubPar<'s>>; 7]);
@@ -133,13 +132,13 @@ impl<'p> Display for Choices<'p> {
             for block in Block::iter() {
                 write!(f, ",")?;
 
-                if let Some((subj, par)) = odd[block] {
-                    write!(f, "{subj} {par}")?;
+                if let Some(sp) = odd[block] {
+                    write!(f, "{sp}")?;
 
-                    if let Some((subj_even, par_even)) = even[block]
-                        && !(ptr::addr_eq(subj, subj_even) && par == par_even)
+                    if let Some(sp_even) = even[block]
+                        && sp != sp_even
                     {
-                        write!(f, " / {subj_even} {par_even}")?;
+                        write!(f, " / {sp_even}")?;
                     };
                 };
             }

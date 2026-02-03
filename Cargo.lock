@@ -239,7 +239,10 @@ dependencies = [
 name = "data"
 version = "0.1.0"
 dependencies = [
+ "num_enum",
  "serde",
+ "strum",
+ "thiserror 2.0.18",
  "typify",
 ]
 
@@ -1546,6 +1549,7 @@ name = "scheduler"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "data",
  "itertools",
  "num_enum",
  "serde",

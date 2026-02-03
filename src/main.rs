@@ -1,41 +1,35 @@
-use anyhow::Context;
+use std::fs::read_to_string;
 
-use crate::data::{Block, Day, Type};
+use data::{Block, Day, SubPar, Type, convert, kos};
 
 pub mod choices;
-pub mod data;
 pub mod json;
 pub mod scheduler;
 
-static DATA: &str = include_str!("data.json");
-
-const CURR: &str = "B252";
-
 fn main() -> anyhow::Result<()> {
-    let mut data = serde_json::from_str::<json::Semesters>(DATA)?;
-    let subjects: Vec<data::Subject> = data
-        .0
-        .remove(CURR)
-        .context("Missing semester")?
-        .into_iter()
-        .filter(|s| {
-            matches!(
-                s.code.as_str(),
-                "BI-PA2.21"
-                    | "BI-MA1.21"
-                    | "BI-DBS.21"
-                    | "BI-SAP.21"
-                    | "BI-LA2.21"
-                    | "BI-PSI.21"
-                    | "A0B04KS2"
-            )
-        })
-        .map(data::Subject::from)
-        .collect();
+    let courses = read_to_string("data/cached/courses.json")?;
+    let parallels = read_to_string("data/cached/parallels.json")?;
+
+    let courses: Vec<kos::courses::Course> = serde_json::from_str(&courses)?;
+    let parallels: Vec<kos::parallels::Parallel> = serde_json::from_str(&parallels)?;
+
+    let mut subjects = convert::convert(courses, parallels);
+    subjects.retain(|s| {
+        matches!(
+            s.code.as_str(),
+            "BI-PA2.21"
+                | "BI-MA1.21"
+                | "BI-DBS.21"
+                | "BI-SAP.21"
+                | "BI-LA2.21"
+                | "A0B04KS2"
+                | "BI-CS1"
+        )
+    });
 
     let mut options = 0;
     let cb = scheduler::SchedulerCallbacks {
-        filter: &|(s, p)| {
+        filter: &|SubPar(s, p)| {
             (match s.code.as_str() {
                 "BI-MA1.21" => match p.kind {
                     Type::L => false,
@@ -54,7 +48,7 @@ fn main() -> anyhow::Result<()> {
                 _ => !matches!(p.time.block, Block::_7_30 | Block::_18_00),
             }
         },
-        select: &|(_, p), choices| choices.consecutive(p.time) < 3,
+        select: &|SubPar(_, p), choices| choices.consecutive(p.time) < 3,
         callback: &mut |choices| {
             options += 1;
 

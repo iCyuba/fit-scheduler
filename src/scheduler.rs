@@ -1,23 +1,22 @@
 use itertools::Itertools;
 
-use crate::{
-    choices::Choices,
-    data::{SubPar, Subject},
-};
+use data::{SubPar, Subject};
 
-pub struct SchedulerCallbacks<'s> {
-    pub filter: &'s dyn Fn(SubPar<'s>) -> bool,
-    pub select: &'s dyn Fn(SubPar<'s>, &Choices<'s>) -> bool,
-    pub callback: &'s mut dyn FnMut(&Choices<'s>),
+use crate::choices::Choices;
+
+pub struct SchedulerCallbacks<'c, 's> {
+    pub filter: &'c dyn Fn(SubPar<'s>) -> bool,
+    pub select: &'c dyn Fn(SubPar<'s>, &Choices<'s>) -> bool,
+    pub callback: &'c mut dyn FnMut(&Choices<'s>),
 }
 
-pub struct Scheduler<'s> {
-    pub callbacks: SchedulerCallbacks<'s>,
+pub struct Scheduler<'c, 's> {
+    pub callbacks: SchedulerCallbacks<'c, 's>,
     choices: Box<Choices<'s>>,
 }
 
-impl<'s> Scheduler<'s> {
-    pub fn new(cb: SchedulerCallbacks<'s>) -> Self {
+impl<'c, 's> Scheduler<'c, 's> {
+    pub fn new(cb: SchedulerCallbacks<'c, 's>) -> Self {
         Self {
             choices: Box::new(Choices::default()),
             callbacks: cb,
@@ -35,7 +34,7 @@ impl<'s> Scheduler<'s> {
             .iter()
             .flat_map(|s| {
                 let fm = move |p| {
-                    let sp = (s, p);
+                    let sp = SubPar(s, p);
 
                     (self.callbacks.filter)(sp).then_some(sp)
                 };
@@ -74,7 +73,7 @@ impl<'s> Scheduler<'s> {
         };
 
         for &sp in parallels {
-            let (_, p) = sp;
+            let SubPar(_, p) = sp;
 
             let odd = self.choices[false][p.time].is_some();
             if odd && self.choices[p.time].is_some() {
