@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use rand::{Rng, rng};
+use rand::{RngExt, rng};
 use reqwest::Client;
 use serde::de::DeserializeOwned;
 use tokio::time::sleep;

@@ -30,13 +30,13 @@ pub fn get_client() -> anyhow::Result<Client> {
     Ok(client)
 }
 
-fn get_headers() -> HeaderMap {
+pub fn get_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
 
     headers.insert(
         USER_AGENT,
         HeaderValue::from_static(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
         ),
     );
 

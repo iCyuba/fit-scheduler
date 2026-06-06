@@ -5,9 +5,19 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-fantoccini = "0.22.0"
+const_format = { version = "0.2.36", features = ["fmt"] }
+cookie_store = "0.22.1"
+html-escape = "0.2.13"
+lol_html = "3.0.0"
+reqwest = { version = "0.13.1", features = ["form", "json", "query"] }
+reqwest_cookie_store = "0.10.0"
 securestore = "0.100.0"
-serde = "1.0.228"
+serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
-tokio = { version = "1", features = ["full"] }
+thiserror = "2.0.18"
+tokio = { version = "1.49.0", features = ["full"] }
 totp-rs = { version = "5.7.0", features = ["otpauth"] }
+
+[features]
+default = ["real"]
+real = []
