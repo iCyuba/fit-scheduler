@@ -1,5 +1,6 @@
 use std::env::{VarError, var};
 
+/// Username and password
 #[derive(Debug, Clone)]
 pub struct Credentials {
     pub username: String,

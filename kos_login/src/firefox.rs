@@ -2,6 +2,10 @@ use reqwest::header::{
     ACCEPT, ACCEPT_LANGUAGE, HeaderMap, HeaderValue, UPGRADE_INSECURE_REQUESTS, USER_AGENT,
 };
 
+/// Headers sent by Firefox
+///
+/// - Is this needed? No.
+/// - Am I doing it anyway? Yes.
 pub fn get_headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
 
