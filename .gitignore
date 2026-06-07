@@ -7,3 +7,4 @@ secret*
 data/cached
 
 cookies.json
+*.env
