@@ -1,4 +1,4 @@
-use data::{Block, Day, SubPar, Type, convert, kos};
+use data::{Block, SubPar, convert, kos};
 use std::fs::read_to_string;
 use std::str::FromStr;
 
@@ -37,7 +37,11 @@ fn main() -> anyhow::Result<()> {
                 .iter()
                 .all(|t| t.block.offset >= from.offset && t.block.offset < to.offset)
         },
-        select: &|SubPar(_, p), choices| /*p.time.iter().all(|&t| choices.consecutive(t) <= 180 / 15*/ true, // TODO : fix ts
+        select: &|SubPar(_, p), choices| {
+            p.time
+                .iter()
+                .all(|&t| choices.consecutive(t) <= 4 * 60 / 15)
+        },
         callback: &mut |choices| {
             options += 1;
 

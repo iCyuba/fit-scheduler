@@ -39,7 +39,8 @@ pub struct ChoicesDay<'s> {
 impl<'s> ChoicesDay<'s> {
     pub fn consecutive(&self) -> u8 {
         let mut count = 0;
-        let mut val = self.occupied;
+        // fill in 15 minute breaks between each lesson
+        let mut val = self.occupied | ((self.occupied >> 1) & (self.occupied << 1));
 
         while val != 0 {
             val = val & (val << 1);
