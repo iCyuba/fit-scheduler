@@ -1,6 +1,6 @@
-use std::fs::read_to_string;
-
 use data::{Block, Day, SubPar, Type, convert, kos};
+use std::fs::read_to_string;
+use std::str::FromStr;
 
 pub mod choices;
 pub mod json;
@@ -17,42 +17,32 @@ fn main() -> anyhow::Result<()> {
     subjects.retain(|s| {
         matches!(
             s.code.as_str(),
-            "BI-PA2.21"
-                | "BI-MA1.21"
-                | "BI-DBS.21"
-                | "BI-SAP.21"
-                | "BI-LA2.21"
-                | "A0B04KS2"
-                | "BI-CS1"
+            "BI-AAG.21"
+                | "BI-AG1.21"
+                | "BI-MA2.21"
+                | "BI-APS.21"
+                | "BI-UKB.21"
+                | "BI-IDO.21"
+                | "BI-VR1"
         )
     });
+
+    let from = Block::from_str("9:15")?;
+    let to = Block::from_str("18:00")?;
 
     let mut options = 0;
     let cb = scheduler::SchedulerCallbacks {
         filter: &|SubPar(s, p)| {
-            (match s.code.as_str() {
-                "BI-MA1.21" => match p.kind {
-                    Type::L => false,
-                    Type::C => true,
-                    Type::P => p.time.day == Day::Thursday,
-                },
-
-                "BI-DBS.21" => p.kind != Type::L || p.time.day == Day::Wednesday,
-
-                _ => true,
-            }) && match p.time.day {
-                Day::Thursday => {
-                    matches!(p.time.block, Block::_12_45 | Block::_14_30 | Block::_16_15)
-                }
-                Day::Friday => false,
-                _ => !matches!(p.time.block, Block::_7_30 | Block::_18_00),
-            }
+            p.time
+                .iter()
+                .all(|t| t.block.offset >= from.offset && t.block.offset < to.offset)
         },
-        select: &|SubPar(_, p), choices| choices.consecutive(p.time) < 3,
+        select: &|SubPar(_, p), choices| /*p.time.iter().all(|&t| choices.consecutive(t) <= 180 / 15*/ true, // TODO : fix ts
         callback: &mut |choices| {
             options += 1;
 
-            println!("{options}{choices}");
+            println!("{options}:");
+            println!("{choices}");
         },
     };
 

@@ -1,8 +1,8 @@
+use smallvec::SmallVec;
 use std::{collections::HashMap, str::FromStr};
-
 use thiserror::Error;
 
-use crate::{kos, parsed};
+use crate::{BlockParseError, kos, parsed};
 
 pub fn convert(
     courses: impl IntoIterator<Item = kos::courses::Course>,
@@ -55,6 +55,9 @@ pub enum ParallelParseError {
     Strum(#[from] strum::ParseError),
 
     #[error(transparent)]
+    BlockParse(#[from] BlockParseError),
+
+    #[error(transparent)]
     Int(#[from] std::num::TryFromIntError),
 
     #[error(transparent)]
@@ -69,14 +72,31 @@ impl TryFrom<kos::parallels::Parallel> for parsed::Parallel {
             return Err(ParallelParseError::InvalidTimetableLen);
         }
 
-        let timetable = &value.timetable[0];
+        let time = value
+            .timetable
+            .iter()
+            .map(|v| {
+                let start = parsed::Block::from_str(&v.ticket_start.0)?;
+                let end = parsed::Block::from_str(&v.ticket_end.0)?;
+
+                let day = parsed::Day::try_from(u8::try_from(v.day_number)?)?;
+                let week = v
+                    .even_odd_week
+                    .as_ref()
+                    .map(|w| parsed::Week::from_str(&w.0))
+                    .transpose()?;
+
+                Ok(parsed::Time {
+                    day,
+                    block: start,
+                    week,
+                    duration: end.offset - start.offset,
+                })
+            })
+            .collect::<Result<SmallVec<_>, Self::Error>>()?;
 
         Ok(Self {
-            time: parsed::Time {
-                day: parsed::Day::try_from(u8::try_from(timetable.day_number)?)?,
-                block: parsed::Block::from_str(&timetable.ticket_start.0)?,
-                biweekly: timetable.even_odd_week.is_some(),
-            },
+            time,
             kind: parsed::Type::from_str(&value.parallel_type.code.0)?,
         })
     }

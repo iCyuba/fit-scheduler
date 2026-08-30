@@ -51,9 +51,6 @@
             "$ref": "#/definitions/Value"
           }
         },
-        "repeatedRegistration": {
-          "type": "boolean"
-        },
         "state": {
           "$ref": "#/definitions/Value"
         },
@@ -111,6 +108,9 @@
             ".pdf",
             ".php"
           ]
+        },
+        "repeatedCompletion": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -121,11 +121,11 @@
         "id",
         "nameCs",
         "programmeTypes",
-        "repeatedRegistration",
         "state",
         "studyForm",
         "teachingLanguage",
-        "withoutSchedule"
+        "withoutSchedule",
+        "repeatedCompletion"
       ],
       "title": "Course"
     },

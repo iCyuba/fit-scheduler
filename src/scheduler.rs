@@ -1,8 +1,7 @@
+use data::{Parallel, SubPar, Subject};
 use itertools::Itertools;
 
-use data::{SubPar, Subject};
-
-use crate::choices::Choices;
+use crate::choices::{Choice, Choices};
 
 pub struct SchedulerCallbacks<'c, 's> {
     pub filter: &'c dyn Fn(SubPar<'s>) -> bool,
@@ -62,6 +61,17 @@ impl<'c, 's> Scheduler<'c, 's> {
             .collect_vec()
     }
 
+    fn fits_time(&self, time: &data::Time, even: bool) -> bool {
+        self.choices[even][time.day].occupied & u128::from(time) == 0
+    }
+
+    fn fits(&self, parallel: &Parallel) -> bool {
+        parallel.time.iter().all(|t| {
+            !(t.week != Some(data::Week::L) && !self.fits_time(t, true))
+                && !(t.week != Some(data::Week::S) && !self.fits_time(t, false))
+        })
+    }
+
     fn select<'a>(&mut self, mut iter: impl Iterator<Item = &'a Vec<SubPar<'s>>> + Clone)
     where
         's: 'a,
@@ -73,32 +83,46 @@ impl<'c, 's> Scheduler<'c, 's> {
         };
 
         for &sp in parallels {
-            let SubPar(_, p) = sp;
-
-            let odd = self.choices[false][p.time].is_some();
-            if odd && self.choices[p.time].is_some() {
+            let SubPar(s, p) = sp;
+            if !self.fits(p) {
                 continue;
             }
 
-            let mut index_a = p.time;
-            let mut index_b = p.time;
-
-            if !p.time.biweekly {
-                index_a.biweekly = true;
-            } else if !odd {
-                index_a.biweekly = false;
-                index_b.biweekly = false;
+            for t in &p.time {
+                if t.week != Some(data::Week::L) {
+                    self.choices.add_choice(
+                        Choice {
+                            time: t,
+                            kind: p.kind,
+                            subject: s,
+                        },
+                        true,
+                    );
+                }
+                if t.week != Some(data::Week::S) {
+                    self.choices.add_choice(
+                        Choice {
+                            time: t,
+                            kind: p.kind,
+                            subject: s,
+                        },
+                        false,
+                    );
+                }
             }
-
-            self.choices[index_a] = Some(sp);
-            self.choices[index_b] = Some(sp);
 
             if (self.callbacks.select)(sp, &self.choices) {
                 self.select(iter.clone());
             }
 
-            self.choices[index_a] = None;
-            self.choices[index_b] = None;
+            for t in &p.time {
+                if t.week != Some(data::Week::L) {
+                    self.choices.remove_choice(t.day, true);
+                }
+                if t.week != Some(data::Week::S) {
+                    self.choices.remove_choice(t.day, false);
+                }
+            }
         }
     }
 }
