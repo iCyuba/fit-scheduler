@@ -97,6 +97,11 @@ impl TryFrom<kos::parallels::Parallel> for parsed::Parallel {
 
         Ok(Self {
             time,
+            teachers: [value.teacher1, value.teacher2]
+                .iter()
+                .flatten()
+                .map(|x| x.id)
+                .collect(),
             kind: parsed::Type::from_str(&value.parallel_type.code.0)?,
         })
     }

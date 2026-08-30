@@ -26,6 +26,7 @@ pub struct Subject {
 pub struct Parallel {
     pub time: SmallVec<[Time; 4]>,
     pub kind: Type,
+    pub teachers: SmallVec<[i64; 2]>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, IntoPrimitive, EnumIter, Display)]
