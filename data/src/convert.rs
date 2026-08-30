@@ -68,7 +68,7 @@ impl TryFrom<kos::parallels::Parallel> for parsed::Parallel {
     type Error = ParallelParseError;
 
     fn try_from(value: kos::parallels::Parallel) -> Result<Self, Self::Error> {
-        if value.timetable.len() != 1 {
+        if value.timetable.is_empty() {
             return Err(ParallelParseError::InvalidTimetableLen);
         }
 
