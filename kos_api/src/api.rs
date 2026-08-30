@@ -58,7 +58,7 @@ impl Fetchable for Parallel {
 
     fn query() -> Query {
         Query {
-            query: Some("semesterId==B252"),
+            query: Some("semesterId==B261"),
             expanded: Some("timetable.room"),
             ..Default::default()
         }
